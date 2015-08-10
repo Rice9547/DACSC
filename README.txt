@@ -12,4 +12,4 @@ Facebook粉絲專業(兩個皆是)
 大安高工電腦研究社17th：https://www.facebook.com/dacsc17th?fref=ts
 
 對於網站有任何漏洞請告知第十七屆教學/網管
-我們將以最快速度修復
+我們將以最快速度修復 
