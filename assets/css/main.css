@@ -1369,7 +1369,7 @@
 		button.style1,
 		.button.style1 {
 			background: #5e8adb url("images/overlay.png");
-			color: #80c117;
+			color: #fff;
 		}
 
 			input[type="button"].style1:hover,
