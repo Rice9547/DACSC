@@ -20,19 +20,7 @@
 		<!-- Optionally add helpers - button, thumbnail and/or media -->
 		<link rel="stylesheet" href="../fancybox/source/helpers/jquery.fancybox-thumbs.css" type="text/css" media="screen" />
 		<script type="text/javascript" src="../fancybox/source/helpers/jquery.fancybox-thumbs.js"></script>
-		<style>
-			.photoTable>tbody>tr{
-				height:145;
-			}
-			.photoTable>tbody>tr>td{
-				width:200;
-			}
-			.photoTable>tbody>tr>td>a>img{
-				width: 200;
-				height: 133
-                    ;
-			}
-		</style>
+
 		<script>
 			$(document).ready(function() {
 				$(".fancybox-thumb").fancybox({
@@ -66,7 +54,7 @@
             else if(winWidth <= 1200) LINE_PHOTO_LENGTH = 5;
             else LINE_PHOTO_LENGTH = 6;
 			var API_URL = 'https://picasaweb.google.com/data/feed/api/user/daancsc/album/1506';
-            alert(winWidth);
+            
 			//注意事項 相簿必須公開
 			//title:照片檔名
 			//desc:照片描述
