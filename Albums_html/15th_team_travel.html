@@ -1,21 +1,112 @@
-<!DOCTYPE HTML>
-<!--
-	It's apply mechanically HTML5 up templates
-    I use escape-velocity
--->
-<html>
+<html ng-app>
 	<head>
-		<title>大安高工電腦研究社</title>
+        <title>大安高工電腦研究社</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
 		<link rel="stylesheet" href="../assets/css/main.css" />
 		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<script type="text/javascript" src="https://code.angularjs.org/1.2.1/angular.js"></script>
+
+		<!-- Add jQuery library -->
+		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+		<!-- Add mousewheel plugin (this is optional) -->
+		<script type="text/javascript" src="../fancybox/lib/jquery.mousewheel-3.0.6.pack.js"></script>
+		<!-- Add fancyBox -->
+		<link rel="stylesheet" href="../fancybox/source/jquery.fancybox.css" type="text/css" media="screen" />
+		<script type="text/javascript" src="../fancybox/source/jquery.fancybox.pack.js"></script>
+
+		<!-- Optionally add helpers - button, thumbnail and/or media -->
+		<link rel="stylesheet" href="../fancybox/source/helpers/jquery.fancybox-thumbs.css" type="text/css" media="screen" />
+		<script type="text/javascript" src="../fancybox/source/helpers/jquery.fancybox-thumbs.js"></script>
+		<style>
+			.photoTable>tbody>tr{
+				height:230;
+			}
+			.photoTable>tbody>tr>td{
+				width:200;
+			}
+			.photoTable>tbody>tr>td>a>img{
+				width: 320;
+				height: 214;
+			}
+		</style>
+		<script>
+			$(document).ready(function() {
+				$(".fancybox-thumb").fancybox({
+					prevEffect	: 'none',
+					nextEffect	: 'none',
+					helpers	: {
+						title	: {
+							type: 'outside'
+						},
+						thumbs	: {
+							width	: 50,
+							height	: 50
+						}
+					}
+				});
+			});
+		</script>
+		<script>
+            var winWidth = 0;
+            if(window.innerWidth)
+                winWidth=window.innerWidth;
+            else if((document.body)&&(document.body.clientWidth))
+                winWidth=document.body.clientWidth;
+			//一排幾張照片
+			var LINE_PHOTO_LENGTH = 4;
+			//相簿連結 https://picasaweb.google.com/data/feed/api/user/<Your Account>/album/<相簿名稱>
+            if(winWidth <= 736) LINE_PHOTO_LENGTH = 1;
+            else if(winWidth <=1200) LINE_PHOTO_LENGTH = 2;
+            else LINE_PHOTO_LENGTH = 4;
+			var API_URL = 'https://picasaweb.google.com/data/feed/api/user/daancsc/album/1502';
+			//注意事項 相簿必須公開
+			//title:照片檔名
+			//desc:照片描述
+			function pagePhotoController($scope,$http){	
+				$scope.photos = [];
+				
+				$http({
+				    url:API_URL,
+				    method:'GET',
+				    params : {
+				      imgmax:720,
+				      alt: 'json-in-script',
+				      callback:'picasaCallback'
+				    },
+				    headers: {
+				        'Content-type': 'application/json'
+				    }
+				}).success(function(data){		
+				  data = data.replace('// API callback','');
+				  data = data.replace('picasaCallback(','');
+				  data = data.replace(');','');
+				  data = jQuery.parseJSON(data);
+				  var photoRow = new Array();
+				  $scope.photos.push(photoRow);
+				  $.each(data.feed.entry, function(){
+				  	if(photoRow.length>=LINE_PHOTO_LENGTH){
+				  		photoRow = new Array();
+				  		$scope.photos.push(photoRow);
+				  	}
+				 	 photoRow.push({
+				 	   id: this.content.src,
+				       src: this.content.src,
+				       title:this.media$group.media$title.$t.replace('.jpg',''),
+				       desc:this.media$group.media$description.$t
+				     });
+				   });	
+			    }).error(function(data){
+			    	console.log(data);
+			    });
+			}
+		</script>
 	</head>
 	<body class="no-sidebar">
-		<div id="page-wrapper">
-
-			<!-- Header -->
+        <div id="page-wrapper">
+            <!-- Header -->
 				<div id="header-wrapper" class="wrapper">
 					<div id="header">
 
@@ -53,27 +144,22 @@
 							</nav>
 					</div>
 				</div>
-            <div class="wrapper style1">
-                <div class="title">第十五屆社遊</div>
-                <div id=intro class="container"> 
-                    <div class="video-container">
-                    <embed type="application/x-shockwave-flash" src="https://photos.gstatic.com/media/slideshow.swf" width="800" height="533" flashvars="host=picasaweb.google.com&hl=zh_TW&feat=flashalbum&RGB=0x000000&feed=https%3A%2F%2Fpicasaweb.google.com%2Fdata%2Ffeed%2Fapi%2Fuser%2F103846259066563992892%2Falbumid%2F6049308479152446673%3Falt%3Drss%26kind%3Dphoto%26hl%3Dzh_TW" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed>
-                    </div>
-                <ul class="actions">
-                    <li><a href="../Albums.html" class="button style1">返回相簿</a></li>
-                </ul>
-                </div>
-            </div>
+        </div>
+        <div class="wrapper style1">
+            <div class="title">第十五屆社遊</div>
+            <div ng-controller="pagePhotoController" class="container" id="intro">
+			<table class="photoTable">
+				<tbody>
+					<tr ng-repeat="photoRow in photos" align="center">
+						<td ng-repeat="photo in photoRow">
+							<a  class="fancybox-thumb" rel="fancybox-thumb" href="{{photo.src}}">
+								<img ng-src="{{photo.src}}" alt="" />
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
-		<!-- Scripts -->
-
-			<script src="../assets/js/jquery.min.js"></script>
-			<script src="../assets/js/jquery.dropotron.min.js"></script>
-			<script src="../assets/js/skel.min.js"></script>
-			<script src="../assets/js/skel-viewport.min.js"></script>
-			<script src="../assets/js/util.js"></script>
-			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-			<script src="../assets/js/main.js"></script>
-
+        </div>
 	</body>
 </html>
