@@ -58,9 +58,12 @@
 			//一排幾張照片
 			var LINE_PHOTO_LENGTH = 4;
 			//相簿連結 https://picasaweb.google.com/data/feed/api/user/<Your Account>/album/<相簿名稱>
-            if(winWidth <= 736) LINE_PHOTO_LENGTH = 1;
-            else if(winWidth <=1200) LINE_PHOTO_LENGTH = 2;
-            else LINE_PHOTO_LENGTH = 4;
+            if(winWidth <= 475) LINE_PHOTO_LENGTH = 1;
+            else if(winWidth <= 800) LINE_PHOTO_LENGTH = 2;
+            else if(winWidth <= 1000) LINE_PHOTO_LENGTH = 3;
+            else if(winWidth <= 1050) LINE_PHOTO_LENGTH = 4;
+            else if(winWidth <= 1200) LINE_PHOTO_LENGTH = 5;
+            else LINE_PHOTO_LENGTH = 6;
 			var API_URL = 'https://picasaweb.google.com/data/feed/api/user/daancsc/album/16th17th';
 			//注意事項 相簿必須公開
 			//title:照片檔名
