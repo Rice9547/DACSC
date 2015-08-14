@@ -1,0 +1,166 @@
+<html ng-app>
+	<head>
+        <title>大安高工電腦研究社</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<script type="text/javascript" src="https://code.angularjs.org/1.2.1/angular.js"></script>
+
+		<!-- Add jQuery library -->
+		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+		<!-- Add mousewheel plugin (this is optional) -->
+		<script type="text/javascript" src="../fancybox/lib/jquery.mousewheel-3.0.6.pack.js"></script>
+		<!-- Add fancyBox -->
+		<link rel="stylesheet" href="../fancybox/source/jquery.fancybox.css" type="text/css" media="screen" />
+		<script type="text/javascript" src="../fancybox/source/jquery.fancybox.pack.js"></script>
+
+		<!-- Optionally add helpers - button, thumbnail and/or media -->
+		<link rel="stylesheet" href="../fancybox/source/helpers/jquery.fancybox-thumbs.css" type="text/css" media="screen" />
+		<script type="text/javascript" src="../fancybox/source/helpers/jquery.fancybox-thumbs.js"></script>
+		<script>
+			$(document).ready(function() {
+				$(".fancybox-thumb").fancybox({
+					prevEffect	: 'none',
+					nextEffect	: 'none',
+					helpers	: {
+						title	: {
+							type: 'outside'
+						},
+						thumbs	: {
+							width	: 50,
+							height	: 50
+						}
+					}
+				});
+			});
+		</script>
+		<script>
+            var winWidth = 0;
+            if(window.innerWidth)
+                winWidth=window.innerWidth;
+            else if((document.body)&&(document.body.clientWidth))
+                winWidth=document.body.clientWidth;
+			//一排幾張照片
+			var LINE_PHOTO_LENGTH = 4;
+			//相簿連結 https://picasaweb.google.com/data/feed/api/user/<Your Account>/album/<相簿名稱>
+            if(winWidth <= 475) LINE_PHOTO_LENGTH = 1;
+            else if(winWidth <= 800) LINE_PHOTO_LENGTH = 2;
+            else if(winWidth <= 1000) LINE_PHOTO_LENGTH = 3;
+            else if(winWidth <= 1050) LINE_PHOTO_LENGTH = 4;
+            else if(winWidth <= 1200) LINE_PHOTO_LENGTH = 5;
+            else LINE_PHOTO_LENGTH = 6;
+			var API_URL = 'https://picasaweb.google.com/data/feed/api/user/daancsc/album/jrFPSC';
+			//注意事項 相簿必須公開
+			//title:照片檔名
+			//desc:照片描述
+			function pagePhotoController($scope,$http){	
+				$scope.photos = [];
+				
+				$http({
+				    url:API_URL,
+				    method:'GET',
+				    params : {
+				      imgmax:720,
+				      alt: 'json-in-script',
+				      callback:'picasaCallback'
+				    },
+				    headers: {
+				        'Content-type': 'application/json'
+				    }
+				}).success(function(data){		
+				  data = data.replace('// API callback','');
+				  data = data.replace('picasaCallback(','');
+				  data = data.replace(');','');
+				  data = jQuery.parseJSON(data);
+				  var photoRow = new Array();
+				  $scope.photos.push(photoRow);
+				  $.each(data.feed.entry, function(){
+				  	if(photoRow.length>=LINE_PHOTO_LENGTH){
+				  		photoRow = new Array();
+				  		$scope.photos.push(photoRow);
+				  	}
+				 	 photoRow.push({
+				 	   id: this.content.src,
+				       src: this.content.src,
+				       title:this.media$group.media$title.$t.replace('.jpg',''),
+				       desc:this.media$group.media$description.$t
+				     });
+				   });	
+			    }).error(function(data){
+			    	console.log(data);
+			    });
+			}
+		</script>
+	</head>
+	<body class="no-sidebar">
+        <div id="page-wrapper">
+            <!-- Header -->
+				<div id="header-wrapper" class="wrapper">
+					<div id="header">
+
+						<!-- Logo -->
+							<div id="logo">
+								<h1><a href="../index.html">大安高工電腦研究社</a></h1>
+								<p>一群熱愛資訊的人組成的家</p>
+							</div>
+
+						<!-- Nav -->
+							<nav id="nav">
+								<ul>
+									<li class="current"><a href="../index.html">回到首頁</a></li>
+									<li>
+										<a href="#">社團簡介</a>
+										<ul>
+											<li><a href="#">關於我們</a></li>
+											<li><a href="#">社團宗旨</a></li>
+											<li>
+                                                <a href="#">社團成員</a>
+                                                <ul>
+                                                    <li><a href="#">更久以前</a></li>
+                                                    <li><a href="#">百四級</a></li>
+                                                    <li><a href="#">百五級</a></li>
+                                                    <li><a href="#">百六級</a></li>
+                                                </ul>
+                                            </li>
+								            <li><a href="../rule.html">社團規章</a></li>
+										</ul>
+									</li>
+									<li><a href="../Albums.html">活動相簿</a></li>
+									<li><a href="../class.html">課程資源</a></li>
+									<li><a href="../contact.html">聯絡我們</a></li>
+								</ul>
+							</nav>
+					</div>
+				</div>
+        </div>
+        <div class="wrapper style1">
+            <div class="title">相簿範本</div>
+            <div ng-controller="pagePhotoController" class="container" id="intro">
+			<table class="photoTable">
+				<tbody>
+					<tr ng-repeat="photoRow in photos" align="center">
+						<td ng-repeat="photo in photoRow">
+							<a  class="fancybox-thumb" rel="fancybox-thumb" href="{{photo.src}}">
+								<img ng-src="{{photo.src}}" alt="" />
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+            <li><a href="../Albums.html" class="button style1">返回相簿列表</a></li>
+        </div>
+        <!-- Scripts -->
+
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.dropotron.min.js"></script>
+			<script src="../assets/js/skel.min.js"></script>
+			<script src="../assets/js/skel-viewport.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+			<script src="../assets/js/main.js"></script>
+	</body>
+</html>
